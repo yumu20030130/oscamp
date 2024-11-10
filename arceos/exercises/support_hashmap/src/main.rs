@@ -15,7 +15,7 @@ fn main() {
 }
 
 fn test_hashmap() {
-    const N: usize = 50_000;
+    const N: u32 = 50_000;
     let mut m = HashMap::new();
     for value in 0..N {
         let key = format!("key_{value}");
