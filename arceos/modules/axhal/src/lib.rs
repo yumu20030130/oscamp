@@ -71,9 +71,7 @@ pub mod console {
 }
 
 /// Miscellaneous operation, e.g. terminate the system.
-pub mod misc {
-    pub use super::platform::misc::*;
-}
+pub mod misc;
 
 /// Multi-core operations.
 #[cfg(feature = "smp")]

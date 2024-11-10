@@ -40,6 +40,7 @@ members = [
     "tour/h_1_0",
 
     "exercises/print_with_color",
+    "exercises/support_hashmap",
 ]
 
 [workspace.package]

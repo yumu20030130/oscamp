@@ -1,5 +1,11 @@
 #!/bin/sh
 
+rm pflash.img
+rm disk.img
+
+make pflash_img
+make disk_img
+
 make run A=tour/u_1_0
 make run A=tour/u_2_0
 make run A=tour/u_3_0
