@@ -38,6 +38,8 @@ members = [
     "tour/m_1_0",
     "tour/m_2_0",
     "tour/h_1_0",
+
+    "exercises/print_with_color",
 ]
 
 [workspace.package]
