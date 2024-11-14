@@ -33,6 +33,9 @@ cfg_if::cfg_if! {
     } else if #[cfg(feature = "tlsf")] {
         /// The default byte allocator.
         pub type DefaultByteAllocator = allocator::TlsfByteAllocator;
+    } else if #[cfg(feature = "lab")] {
+        /// The default byte allocator.
+        pub type DefaultByteAllocator = lab_allocator::LabByteAllocator;
     }
 }
 
@@ -70,6 +73,8 @@ impl GlobalAllocator {
                 "buddy"
             } else if #[cfg(feature = "tlsf")] {
                 "TLSF"
+            } else if #[cfg(feature = "lab")] {
+                "lab"
             }
         }
     }
@@ -114,7 +119,10 @@ impl GlobalAllocator {
                     .max(layout.size())
                     .next_power_of_two()
                     .max(PAGE_SIZE);
-                let heap_ptr = self.alloc_pages(expand_size / PAGE_SIZE, PAGE_SIZE)?;
+                let heap_ptr = match self.alloc_pages(expand_size / PAGE_SIZE, PAGE_SIZE) {
+                    Ok(ptr) => ptr,
+                    Err(e) => panic!("Bumb: {:?}.", e),
+                };
                 debug!(
                     "expand heap memory: [{:#x}, {:#x})",
                     heap_ptr,
