@@ -25,7 +25,7 @@ const KERNEL_STACK_SIZE: usize = 0x40000; // 256 KiB
 #[cfg_attr(feature = "axstd", no_mangle)]
 fn main() {
     let mut buf = [0u8; 64];
-    if let Err(e) = load_user_app("/sbin/origin.bin", &mut buf) {
+    if let Err(e) = load_user_app("/sbin/origin", &mut buf) {
         panic!("Cannot load app! {:?}", e);
     }
     println!("load user app ok! {}", buf.len());
@@ -90,6 +90,8 @@ fn handle_page_fault(vaddr: VirtAddr, access_flags: MappingFlags, is_user: bool)
         {
             println!("{}: segmentation fault, exit!", axtask::current().id_name());
             axtask::exit(-1);
+        } else {
+            println!("{}: handle page fault OK!", axtask::current().id_name());
         }
         true
     } else {
