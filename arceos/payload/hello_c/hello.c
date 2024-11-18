@@ -2,6 +2,6 @@
 
 int main()
 {
-    printf("Hello, UserApp!\n");
+    puts("Hello, UserApp!\n");
     return 0;
 }

@@ -39,6 +39,7 @@ members = [
     "tour/u_8_0",
     "tour/m_1_0",
     "tour/m_2_0",
+    "tour/m_3_0",
     "tour/h_1_0",
 
     "exercises/print_with_color",
@@ -80,6 +81,7 @@ axruntime = { path = "modules/axruntime" }
 axsync = { path = "modules/axsync" }
 axtask = { path = "modules/axtask" }
 axdma = { path = "modules/axdma" }
+elf = { path = "modules/elf" }
 
 [profile.release]
 lto = true
