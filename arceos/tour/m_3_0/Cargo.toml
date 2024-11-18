@@ -14,3 +14,4 @@ elf = { workspace = true }
 axerrno = "0.1"
 linkme = "0.3"
 kernel-elf-parser = "0.1.0"
+arceos_posix_api = { workspace = true }

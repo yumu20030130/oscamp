@@ -5,7 +5,7 @@ use std::fs::File;
 use alloc::vec::Vec;
 use alloc::vec;
 use axhal::paging::MappingFlags;
-use axhal::mem::{PAGE_SIZE_4K, phys_to_virt, VirtAddr, MemoryAddr};
+use axhal::mem::{PAGE_SIZE_4K, VirtAddr, MemoryAddr};
 use axmm::AddrSpace;
 
 use elf::abi::{PT_INTERP, PT_LOAD};
@@ -19,7 +19,7 @@ const ELF_HEAD_BUF_SIZE: usize = 256;
 
 pub fn load_user_app(fname: &str, uspace: &mut AddrSpace) -> io::Result<usize> {
     let mut file = File::open(fname)?;
-    let (phdrs, entry, e_phoff, e_phnum) = load_elf_phdrs(&mut file)?;
+    let (phdrs, entry, _, _) = load_elf_phdrs(&mut file)?;
 
     for phdr in &phdrs {
         ax_println!(
@@ -48,25 +48,6 @@ pub fn load_user_app(fname: &str, uspace: &mut AddrSpace) -> io::Result<usize> {
     }
 
     Ok(entry)
-
-    /*
-    uspace.map_alloc(APP_ENTRY.into(), PAGE_SIZE_4K, MappingFlags::READ|MappingFlags::WRITE|MappingFlags::EXECUTE|MappingFlags::USER, true).unwrap();
-
-    let (paddr, _, _) = uspace
-        .page_table()
-        .query(APP_ENTRY.into())
-        .unwrap_or_else(|_| panic!("Mapping failed for segment: {:#x}", APP_ENTRY));
-
-    ax_println!("paddr: {:#x}", paddr);
-
-    unsafe {
-        core::ptr::copy_nonoverlapping(
-            buf.as_ptr(),
-            phys_to_virt(paddr).as_mut_ptr(),
-            PAGE_SIZE_4K,
-        );
-    }
-    */
 }
 
 fn load_elf_phdrs(file: &mut File) -> io::Result<(Vec<ProgramHeader>, usize, usize, usize)> {
