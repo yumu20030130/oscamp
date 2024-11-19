@@ -46,6 +46,7 @@ members = [
     "exercises/print_with_color",
     "exercises/support_hashmap",
     "exercises/alt_alloc",
+    "exercises/sys_map",
 
     "examples/shell",
 ]
@@ -65,7 +66,7 @@ axstd = { path = "ulib/axstd" }
 axlibc = { path = "ulib/axlibc" }
 
 arceos_api = { path = "api/arceos_api" }
-arceos_posix_api = { path = "api/arceos_posix_api", features = ["fs"] }
+arceos_posix_api = { path = "api/arceos_posix_api", features = ["fs", "fd"] }
 axfeat = { path = "api/axfeat" }
 
 axalloc = { path = "modules/axalloc" }
