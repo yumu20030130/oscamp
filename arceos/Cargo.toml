@@ -40,6 +40,7 @@ members = [
     "tour/m_1_0",
     "tour/m_2_0",
     "tour/m_3_0",
+    "tour/m_3_1",
     "tour/h_1_0",
 
     "exercises/print_with_color",
@@ -64,7 +65,7 @@ axstd = { path = "ulib/axstd" }
 axlibc = { path = "ulib/axlibc" }
 
 arceos_api = { path = "api/arceos_api" }
-arceos_posix_api = { path = "api/arceos_posix_api" }
+arceos_posix_api = { path = "api/arceos_posix_api", features = ["fs"] }
 axfeat = { path = "api/axfeat" }
 
 axalloc = { path = "modules/axalloc" }
