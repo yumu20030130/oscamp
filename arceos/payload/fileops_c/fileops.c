@@ -4,15 +4,12 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-int main()
+void create_file(const char *fname)
 {
     int fd;
     int ret;
-    char fname[] = "test_file";
     char content[] = "hello, arceos!";
-    char buf[64];
 
-    printf("FileOps ...\n");
     fd = creat(fname, 0600);
     if (fd < 0) {
         printf("Create file error!\n");
@@ -24,6 +21,13 @@ int main()
         exit(-1);
     }
     close(fd);
+}
+
+void verify_file(const char *fname)
+{
+    int fd;
+    int ret;
+    char buf[64];
 
     fd = open(fname, O_RDONLY);
     if (fd < 0) {
@@ -38,6 +42,19 @@ int main()
     buf[ret] = 0;
     printf("Read back content: [%d] %s\n", ret, buf);
     close(fd);
+}
+
+int main()
+{
+    int fd;
+    int ret;
+    char fname[] = "test_file";
+
+    printf("FileOps ...\n");
+
+    create_file(fname);
+    verify_file(fname);
+
     printf("FileOps ok!\n");
     return 0;
 }
