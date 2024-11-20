@@ -12,6 +12,11 @@ if [ ! -f $FILE ]; then
     exit
 fi
 
+if [ ! -f ./disk.img ]; then
+    printf "disk.img doesn't exist! Please 'make disk_img'\n"
+    exit
+fi
+
 printf "Write file '$FILE' into disk.img\n"
 
 mkdir -p ./mnt
