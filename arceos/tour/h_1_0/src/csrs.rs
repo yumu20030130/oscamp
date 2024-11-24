@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use defs::*;
 use tock_registers::interfaces::{Readable, Writeable};
 use tock_registers::RegisterLongName;
