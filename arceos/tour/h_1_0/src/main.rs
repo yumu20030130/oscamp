@@ -16,10 +16,6 @@ mod csrs;
 mod sbi;
 mod loader;
 
-use std::io::{self, Read};
-use std::fs::File;
-use axhal::paging::MappingFlags;
-use axhal::mem::{PAGE_SIZE_4K, phys_to_virt};
 use vcpu::VmCpuRegisters;
 use riscv::register::{scause, sstatus};
 use csrs::defs::hstatus;
@@ -89,7 +85,6 @@ fn vmexit_handler(ctx: &VmCpuRegisters) {
                 match msg {
                     SbiMessage::Reset(_) => {
                         ax_println!("Shutdown vm normally!");
-                        sbi_rt::system_reset(sbi_rt::Shutdown, sbi_rt::SystemFailure);
                     },
                     _ => todo!(),
                 }
