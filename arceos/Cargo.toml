@@ -27,6 +27,7 @@ members = [
 
     "payload/origin",
     "payload/skernel",
+    "payload/skernel2",
 
     "tour/u_1_0",
     "tour/u_2_0",
@@ -47,6 +48,7 @@ members = [
     "exercises/support_hashmap",
     "exercises/alt_alloc",
     "exercises/sys_map",
+    "exercises/simple_hv",
 
     "examples/shell",
 ]
