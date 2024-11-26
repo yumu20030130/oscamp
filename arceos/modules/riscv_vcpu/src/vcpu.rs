@@ -14,7 +14,8 @@ use super::sbi::{BaseFunction, PmuFunction, RemoteFenceFunction, SbiMessage};
 
 use super::regs::{GeneralPurposeRegisters, GprIndex};
 use memory_addr::{VirtAddr, PhysAddr};
-use page_table_entry::MappingFlags;
+//use page_table_entry::MappingFlags;
+use axhal::paging::MappingFlags;
 
 /// Guest virtual address.
 pub type GuestVirtAddr = VirtAddr;

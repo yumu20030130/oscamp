@@ -66,7 +66,13 @@ fn main() {
             Ok(exit_reason) => match exit_reason {
                 AxVCpuExitReason::Nothing => {},
                 NestedPageFault{addr, access_flags} => {
-                    panic!("addr {:#x} access {:#x}", addr, access_flags);
+                    info!("addr {:#x} access {:#x}", addr, access_flags);
+                    let mapping_flags = MappingFlags::from_bits(0xf).unwrap();
+                    aspace.map_alloc(addr, 4096, mapping_flags, true);
+                    let buf = "pfld";
+                    aspace.write(addr, buf.as_bytes());
+                    //aspace.read(addr, &mut buf);
+                    //error!("buf: {:?}", buf);
                 },
                 _ => {
                     panic!("Unhandled VM-Exit: {:?}", exit_reason);
