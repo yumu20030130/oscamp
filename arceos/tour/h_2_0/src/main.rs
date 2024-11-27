@@ -60,7 +60,9 @@ fn main() {
                     let mapping_flags = MappingFlags::from_bits(0xf).unwrap();
                     // Passthrough-Mode
                     let _ = aspace.map_linear(addr, addr.as_usize().into(), 4096, mapping_flags);
+
                     /*
+                    // Emulator-Mode
                     aspace.map_alloc(addr, 4096, mapping_flags, true);
                     let buf = "pfld";
                     aspace.write(addr, buf.as_bytes());
