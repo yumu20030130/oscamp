@@ -7,11 +7,8 @@ extern crate log;
 extern crate alloc;
 extern crate axstd as std;
 use alloc::string::ToString;
-use alloc::vec::Vec;
-use alloc::sync::Arc;
-use core::sync::atomic::{AtomicBool, Ordering};
 use riscv_vcpu::AxVCpuExitReason;
-use axerrno::{ax_err, ax_err_type, AxResult};
+use axerrno::{ax_err_type, AxResult};
 use memory_addr::VirtAddr;
 use alloc::string::String;
 use std::fs::File;
@@ -20,6 +17,9 @@ use riscv_vcpu::AxVCpuExitReason::NestedPageFault;
 
 const VM_ASPACE_BASE: usize = 0x0;
 const VM_ASPACE_SIZE: usize = 0x7fff_ffff_f000;
+const PHY_MEM_START: usize = 0x8000_0000;
+const PHY_MEM_SIZE: usize = 0x100_0000;
+const KERNEL_BASE: usize = 0x8020_0000;
 
 use axmm::AddrSpace;
 use axhal::paging::MappingFlags;
@@ -31,34 +31,24 @@ fn main() {
         riscv_vcpu::setup_csrs();
     }
 
-    // Set up Memory regions.
+    // Setup AddressSpace and regions.
     let mut aspace = AddrSpace::new_empty(VirtAddr::from(VM_ASPACE_BASE), VM_ASPACE_SIZE).unwrap();
 
-    let gpa = 0x8000_0000;
-    let g_size = 0x100_0000;
+    // Physical memory region. Full access flags.
     let mapping_flags = MappingFlags::from_bits(0xf).unwrap();
-    aspace.map_alloc(
-        gpa.into(),
-        g_size,
-        mapping_flags,
-        true,
-    ).unwrap();
+    aspace.map_alloc(PHY_MEM_START.into(), PHY_MEM_SIZE, mapping_flags, true).unwrap();
 
     // Load corresponding images for VM.
     info!("VM created success, loading images...");
-    let gpa = 0x8020_0000;
-    //let image_fname = "starry-next_riscv64-qemu-virt.bin";
-    //let image_fname = "arceos-riscv64.bin";
     let image_fname = "/sbin/u_3_0_riscv64-qemu-virt.bin";
-    load_vm_image(image_fname.to_string(), gpa.into(), &aspace).expect("Failed to load VM images");
+    load_vm_image(image_fname.to_string(), KERNEL_BASE.into(), &aspace).expect("Failed to load VM images");
 
     // Create VCpus.
     let mut arch_vcpu = RISCVVCpu::init();
 
     // Setup VCpus.
-    let entry = 0x8020_0000;
-    info!("bsp_entry: {:#x}; ept: {:#x}", entry, aspace.page_table_root());
-    arch_vcpu.set_entry(entry.into()).unwrap();
+    info!("bsp_entry: {:#x}; ept: {:#x}", KERNEL_BASE, aspace.page_table_root());
+    arch_vcpu.set_entry(KERNEL_BASE.into()).unwrap();
     arch_vcpu.set_ept_root(aspace.page_table_root()).unwrap();
 
     loop {
@@ -66,16 +56,15 @@ fn main() {
             Ok(exit_reason) => match exit_reason {
                 AxVCpuExitReason::Nothing => {},
                 NestedPageFault{addr, access_flags} => {
-                    info!("addr {:#x} access {:#x}", addr, access_flags);
+                    debug!("addr {:#x} access {:#x}", addr, access_flags);
                     let mapping_flags = MappingFlags::from_bits(0xf).unwrap();
+                    // Passthrough-Mode
+                    let _ = aspace.map_linear(addr, addr.as_usize().into(), 4096, mapping_flags);
                     /*
                     aspace.map_alloc(addr, 4096, mapping_flags, true);
                     let buf = "pfld";
                     aspace.write(addr, buf.as_bytes());
                     */
-                    let ret = aspace.map_linear(addr, addr.as_usize().into(), 4096, mapping_flags);
-                    //aspace.read(addr, &mut buf);
-                    //error!("buf: {:?}", buf);
                 },
                 _ => {
                     panic!("Unhandled VM-Exit: {:?}", exit_reason);
@@ -86,12 +75,9 @@ fn main() {
             }
         }
     }
-
-    unreachable!("VMM start failed")
 }
 
 fn load_vm_image(image_path: String, image_load_gpa: VirtAddr, aspace: &AddrSpace) -> AxResult {
-    info!("load_vm_image: {} {:?}", image_path, image_load_gpa);
     use std::io::{BufReader, Read};
     let (image_file, image_size) = open_image_file(image_path.as_str())?;
 

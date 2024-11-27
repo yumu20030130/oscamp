@@ -16,12 +16,8 @@ use super::regs::{GeneralPurposeRegisters, GprIndex};
 use memory_addr::{VirtAddr, PhysAddr};
 use axhal::paging::MappingFlags;
 
-/// Guest virtual address.
-pub type GuestVirtAddr = VirtAddr;
 /// Guest physical address.
 pub type GuestPhysAddr = VirtAddr;
-/// Host virtual address.
-pub type HostVirtAddr = VirtAddr;
 /// Host physical address.
 pub type HostPhysAddr = PhysAddr;
 
@@ -244,11 +240,6 @@ impl RISCVVCpu {
             _run_guest(regs);
         }
         self.vmexit_handler()
-    }
-
-    /// Set one of the vCPU's general purpose register.
-    fn set_gpr(&mut self, index: usize, val: usize) {
-        self.set_gpr_from_gpr_index(GprIndex::from_raw(index as u32).unwrap(), val);
     }
 }
 

@@ -17,7 +17,7 @@ mod vcpu;
 pub use self::vcpu::RISCVVCpu;
 pub use detect::detect_h_extension as has_hardware_support;
 pub use vcpu::AxVCpuExitReason;
-use csrs::{traps, CSR, traps::interrupt, RiscvCsrTrait};
+use csrs::{traps, CSR, RiscvCsrTrait};
 
 pub struct RISCVPerCpu {}
 
