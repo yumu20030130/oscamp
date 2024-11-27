@@ -68,9 +68,12 @@ fn main() {
                 NestedPageFault{addr, access_flags} => {
                     info!("addr {:#x} access {:#x}", addr, access_flags);
                     let mapping_flags = MappingFlags::from_bits(0xf).unwrap();
+                    /*
                     aspace.map_alloc(addr, 4096, mapping_flags, true);
                     let buf = "pfld";
                     aspace.write(addr, buf.as_bytes());
+                    */
+                    let ret = aspace.map_linear(addr, addr.as_usize().into(), 4096, mapping_flags);
                     //aspace.read(addr, &mut buf);
                     //error!("buf: {:?}", buf);
                 },
@@ -88,7 +91,7 @@ fn main() {
 }
 
 fn load_vm_image(image_path: String, image_load_gpa: VirtAddr, aspace: &AddrSpace) -> AxResult {
-    error!("*********** load_vm_image: {} {:?}", image_path, image_load_gpa);
+    info!("load_vm_image: {} {:?}", image_path, image_load_gpa);
     use std::io::{BufReader, Read};
     let (image_file, image_size) = open_image_file(image_path.as_str())?;
 
@@ -98,7 +101,6 @@ fn load_vm_image(image_path: String, image_load_gpa: VirtAddr, aspace: &AddrSpac
     let mut file = BufReader::new(image_file);
 
     for buffer in image_load_regions {
-        error!("*** buffer {}", buffer.len());
         file.read_exact(buffer).map_err(|err| {
             ax_err_type!(
                 Io,
