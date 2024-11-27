@@ -57,14 +57,16 @@ fn main() {
                 AxVCpuExitReason::Nothing => {},
                 NestedPageFault{addr, access_flags} => {
                     debug!("addr {:#x} access {:#x}", addr, access_flags);
+                    assert_eq!(addr, 0x2200_0000.into(), "Now we ONLY handle pflash#2.");
                     let mapping_flags = MappingFlags::from_bits(0xf).unwrap();
                     // Passthrough-Mode
                     let _ = aspace.map_linear(addr, addr.as_usize().into(), 4096, mapping_flags);
 
                     /*
                     // Emulator-Mode
-                    aspace.map_alloc(addr, 4096, mapping_flags, true);
+                    // Pretend to load file to fill buffer.
                     let buf = "pfld";
+                    aspace.map_alloc(addr, 4096, mapping_flags, true);
                     aspace.write(addr, buf.as_bytes());
                     */
                 },
