@@ -45,6 +45,7 @@ members = [
     "tour/m_3_1",
     "tour/h_1_0",
     "tour/h_2_0",
+    "tour/h_3_0",
 
     "exercises/print_with_color",
     "exercises/support_hashmap",
