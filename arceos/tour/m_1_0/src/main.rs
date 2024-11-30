@@ -27,10 +27,12 @@ const APP_ENTRY: usize = 0x1000;
 
 #[cfg_attr(feature = "axstd", no_mangle)]
 fn main() {
-    // A new address space for user app.
+    // A new address space for user app. 
+    // 把高端处的内核空间映射出来
     let mut uspace = axmm::new_user_aspace().unwrap();
 
-    // Load user app binary file into address space.
+    // Load user app binary file into address space. 
+    // 把对应的img/bin文件（就是直接一堆指令和数据）放到以APP_ENTRY为起始虚拟地址的地方
     if let Err(e) = load_user_app("/sbin/origin", &mut uspace) {
         panic!("Cannot load app! {:?}", e);
     }
@@ -42,6 +44,8 @@ fn main() {
     // Let's kick off the user process.
     let user_task = task::spawn_user_task(
         Arc::new(Mutex::new(uspace)),
+        // 用户空间上下文 目前主要保存指令指针和栈指针和sstatus
+        // TrapFrame
         UspaceContext::new(APP_ENTRY.into(), ustack_top),
     );
 

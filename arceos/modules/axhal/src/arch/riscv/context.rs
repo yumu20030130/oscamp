@@ -121,6 +121,8 @@ pub struct TaskContext {
 
     pub tp: usize,
     /// The `satp` register value, i.e., the page table root.
+    /// 当启用了用户与内核分离时，意味着页表不再是全局资源，而是附属于各个进程的资源，则需要放在TaskInner里
+    /// 这个页表是这个进程的内核态和用户态共享的，所以应该放在TaskContext而不是TaskExt里的UspaceContext里
     #[cfg(feature = "uspace")]
     pub satp: PhysAddr,
     // TODO: FP states
@@ -171,6 +173,7 @@ impl TaskContext {
             self.tp = super::read_thread_pointer();
             unsafe { super::write_thread_pointer(next_ctx.tp) };
         }
+        // 注意，在转换进程的时候，页表也要切换，在内核态上下文切换的前一步
         #[cfg(feature = "uspace")]
         unsafe {
             if self.satp != next_ctx.satp {
@@ -257,11 +260,17 @@ impl UspaceContext {
 
         super::disable_irqs();
         sscratch::write(kstack_top.as_usize());
+
+        // 写入用户态的sepc，即之前设置的entry
         sepc::write(self.0.sepc);
+
+        // 把当前的寄存器值写入内核栈，加载UspaceContext
         // Address of the top of the kernel stack after saving the trap frame.
         let kernel_trap_addr = kstack_top.as_usize() - core::mem::size_of::<TrapFrame>();
+
+        // 此时的sp其实就是kstack_top，即内核栈的顶部，前面已经设置了sscratch，所以可以直接覆盖
         asm!("
-            mv      sp, {tf}
+            mv      sp, {tf} 
             
             STR     gp, {kernel_trap_addr}, 2
             LDR     gp, sp, 2

@@ -5,6 +5,7 @@ use memory_addr::{PageIter4K, PhysAddr, VirtAddr, PAGE_SIZE_4K};
 
 use super::Backend;
 
+// 用户态的alloc策略的页请求，最终由global_allocator来分配虚拟页（和物理页一一对应，相当于分配物理页）
 fn alloc_frame(zeroed: bool) -> Option<PhysAddr> {
     let vaddr = VirtAddr::from(global_allocator().alloc_pages(1, PAGE_SIZE_4K).ok()?);
     if zeroed {

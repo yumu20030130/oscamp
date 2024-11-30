@@ -19,6 +19,7 @@ pub fn load_user_app(fname: &str, uspace: &mut AddrSpace) -> io::Result<()> {
     ax_println!("paddr: {:#x}", paddr);
 
     unsafe {
+        // 现在这个页表还没生效，只能沿用之前那个linear的页表转换，才能访问到这个物理地址
         core::ptr::copy_nonoverlapping(
             buf.as_ptr(),
             phys_to_virt(paddr).as_mut_ptr(),
